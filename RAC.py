@@ -11,10 +11,10 @@ def is_correctly_named(filename):
 
 def get_conversion_format():
     while True:
-        choice = input("Выберите формат для конвертации (png/jpg): ").strip().lower()
+        choice = input("Choose a format for conversion (png/jpg): ").strip().lower()
         if choice in ["png", "jpg"]:
             return choice
-        print("Неверный ввод. Введите 'png' или 'jpg'.")
+        print("Invalid input. Enter 'png' or 'jpg'.")
 
 conversion_format = get_conversion_format()
 folder_path = os.getcwd()
@@ -43,7 +43,7 @@ processed = 0
 for old_name, new_name in rename_map.items():
     os.rename(os.path.join(folder_path, old_name), os.path.join(folder_path, new_name))
     processed += 1
-    print(f"\rОбработано: {processed}/{total_files} файлов", end="", flush=True)
+    print(f"\rProcessed: {processed}/{total_files} files", end="", flush=True)
 
 files_after_rename = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
 convert_files = [f for f in files_after_rename if os.path.splitext(f)[1].lower() not in non_images + excluded_extensions]
@@ -68,12 +68,12 @@ def convert_file(file):
             os.remove(file_path)
         with lock:
             processed += 1
-            print(f"\rОбработано: {processed}/{total_files} файлов", end="", flush=True)
+            print(f"\rProcessed: {processed}/{total_files} files", end="", flush=True)
     except Exception as e:
-        print(f"\rОшибка при конвертации {file}: {e}", flush=True)
+        print(f"\rError converting {file}: {e}", flush=True)
 
 with ThreadPoolExecutor() as executor:
     executor.map(convert_file, convert_files)
 
-input("\nНажмите Enter для завершения.")
-print("Готово!")
+input("\nPress Enter to finish.")
+print("Done!")
