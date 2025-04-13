@@ -15,7 +15,7 @@ def check_for_updates():
         response = requests.get("https://api.github.com/repos/Diramix/Renamer-And-Converter/releases/latest")
         latest_release = response.json()
         latest_version = latest_release["name"]
-        current_version = "1.0.0" 
+        current_version = "1.1.0" 
 
         if latest_version != current_version:
             print(f"New version available: {latest_version}")
