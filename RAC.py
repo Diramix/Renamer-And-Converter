@@ -1,4 +1,5 @@
 import os
+import sys
 import re
 import requests
 import pillow_avif
@@ -22,7 +23,7 @@ def check_for_updates():
             update_choice = input(f"Do you want to update to version {latest_version}? (Y/n): ").strip().lower() or "y"
             if update_choice == "y":
                 webbrowser.open(f"https://github.com/Diramix/Renamer-And-Converter/releases/tag/{latest_version}")
-                exit()
+                sys.exit()
     except Exception as e:
         print(f"Error checking for updates: {e}")
     return False
