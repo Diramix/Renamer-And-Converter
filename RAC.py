@@ -1,10 +1,33 @@
 import os
 import re
+import requests
+import pillow_avif
 from PIL import Image
 from concurrent.futures import ThreadPoolExecutor
+import requests
+import webbrowser
 
 non_images = [".gif", ".mp4", ".avi", ".mkv", ".mov", ".flv", ".webm"]
 excluded_extensions = [".py", ".exe"]
+
+def check_for_updates():
+    try:
+        response = requests.get("https://api.github.com/repos/Diramix/Renamer-And-Converter/releases/latest")
+        latest_release = response.json()
+        latest_version = latest_release["name"]
+        current_version = "1.0.0" 
+
+        if latest_version != current_version:
+            print(f"New version available: {latest_version}")
+            update_choice = input(f"Do you want to update to version {latest_version}? (Y/n): ").strip().lower() or "y"
+            if update_choice == "y":
+                webbrowser.open(f"https://github.com/Diramix/Renamer-And-Converter/releases/tag/{latest_version}")
+                exit()
+    except Exception as e:
+        print(f"Error checking for updates: {e}")
+    return False
+
+check_for_updates();
 
 def is_correctly_named(filename):
     return bool(re.match(r'^(\d+)\.[a-zA-Z0-9]+$', filename))
@@ -71,9 +94,6 @@ def convert_file(file):
             print(f"\rProcessed: {processed}/{total_files} files", end="", flush=True)
     except Exception as e:
         print(f"\rError converting {file}: {e}", flush=True)
-
-with ThreadPoolExecutor() as executor:
-    executor.map(convert_file, convert_files)
 
 input("\nPress Enter to finish.")
 print("Done!")
