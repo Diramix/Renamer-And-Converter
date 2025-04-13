@@ -5,8 +5,8 @@ import requests
 import pillow_avif
 from PIL import Image
 from concurrent.futures import ThreadPoolExecutor
-import requests
 import webbrowser
+import threading
 
 non_images = [".gif", ".mp4", ".avi", ".mkv", ".mov", ".flv", ".webm"]
 excluded_extensions = [".py", ".exe"]
@@ -16,8 +16,7 @@ def check_for_updates():
         response = requests.get("https://api.github.com/repos/Diramix/Renamer-And-Converter/releases/latest")
         latest_release = response.json()
         latest_version = latest_release["name"]
-        current_version = "1.1.0" 
-
+        current_version = "1.1.1"
         if latest_version != current_version:
             print(f"New version available: {latest_version}")
             update_choice = input(f"Do you want to update to version {latest_version}? (Y/n): ").strip().lower() or "y"
@@ -28,7 +27,7 @@ def check_for_updates():
         print(f"Error checking for updates: {e}")
     return False
 
-check_for_updates();
+check_for_updates()
 
 def is_correctly_named(filename):
     return bool(re.match(r'^(\d+)\.[a-zA-Z0-9]+$', filename))
@@ -61,20 +60,15 @@ for file in correct_files + incorrect_files:
     rename_map[file] = new_name
     next_number += 1
 
-total_files = len(rename_map)
-processed = 0
-
 for old_name, new_name in rename_map.items():
     os.rename(os.path.join(folder_path, old_name), os.path.join(folder_path, new_name))
-    processed += 1
-    print(f"\rProcessed: {processed}/{total_files} files", end="", flush=True)
 
 files_after_rename = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
 convert_files = [f for f in files_after_rename if os.path.splitext(f)[1].lower() not in non_images + excluded_extensions]
 
-total_files += len(convert_files)
+total_files = len(convert_files)
 processed = 0
-lock = __import__('threading').Lock()
+lock = threading.Lock()
 
 def convert_file(file):
     global processed
@@ -84,6 +78,7 @@ def convert_file(file):
     try:
         if not os.path.exists(new_file_path):
             img = Image.open(file_path)
+            img.load()
             if conversion_format == "jpg":
                 img = img.convert("RGB")
                 img.save(new_file_path, "JPEG", quality=95)
@@ -95,6 +90,9 @@ def convert_file(file):
             print(f"\rProcessed: {processed}/{total_files} files", end="", flush=True)
     except Exception as e:
         print(f"\rError converting {file}: {e}", flush=True)
+
+with ThreadPoolExecutor() as executor:
+    executor.map(convert_file, convert_files)
 
 input("\nPress Enter to finish.")
 print("Done!")
