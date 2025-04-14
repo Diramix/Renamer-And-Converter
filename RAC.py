@@ -8,7 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 import webbrowser
 import threading
 
-non_images = [".gif", ".mp4", ".avi", ".mkv", ".mov", ".flv", ".webm"]
+non_images = [".gif", ".mp4", ".avi", ".mkv", ".mov", ".flv", ".webm", ".hide"]
 excluded_extensions = [".py", ".exe"]
 
 def check_for_updates():
@@ -16,7 +16,7 @@ def check_for_updates():
         response = requests.get("https://api.github.com/repos/Diramix/Renamer-And-Converter/releases/latest")
         latest_release = response.json()
         latest_version = latest_release["name"]
-        current_version = "1.1.1"
+        current_version = "1.1.2"
         if latest_version != current_version:
             print(f"New version available: {latest_version}")
             update_choice = input(f"Do you want to update to version {latest_version}? (Y/n): ").strip().lower() or "y"
